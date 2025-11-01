@@ -1,0 +1,156 @@
+body {
+  background-color: #d9d9d9;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+h2 {
+  color: #5a0000;
+}
+
+.mes-selector {
+  margin: 10px auto;
+}
+
+select {
+  background-color: #5a0000;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  transition: 0.3s;
+  margin: 0 5px;
+}
+
+select:hover {
+  background-color: white;
+  color: #5a0000;
+  cursor: pointer;
+}
+
+table {
+  width: 80%;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background: #e5e5e5;
+}
+
+th, td {
+  border: 1px solid #5a0000;
+  height: 80px;
+  text-align: center;
+  color: #5a0000;
+  font-weight: bold;
+  vertical-align: top;
+  position: relative;
+}
+
+td span.agendamento {
+  display: block;
+  font-size: 12px;
+  background: #5a0000;
+  color: white;
+  border-radius: 10px;
+  padding: 2px;
+  margin-top: 4px;
+  cursor: pointer;
+}
+
+td:hover {
+  background-color: #f5c5c5;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background: #d9d9d9;
+  border: 2px solid #5a0000;
+  border-radius: 10px;
+  width: 300px;
+  margin: 100px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.modal-content label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+  color: #5a0000;
+}
+
+.modal-content input, .modal-content select {
+  width: 80%;
+  padding: 6px;
+  border-radius: 20px;
+  border: none;
+  background-color: #5a0000;
+  color: white;
+  text-align: center;
+}
+
+.botoes {
+  margin-top: 15px;
+}
+
+.botoes button {
+  background-color: #5a0000;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.botoes button:hover {
+  background-color: #7b0000;
+}
+
+#excluir {
+  background-color: #5a0000;
+}
+
+#excluir:hover {
+  background-color: #5a0000;
+}
+
+.detalhes-box h3 {
+  color: #5a0000;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  table {
+    font-size: 12px;
+  }
+  th, td {
+    padding: 4px;
+  }
+  .modal-content {
+    width: 90%;
+  }
+}
+
+/* Botão excluir no mesmo padrão do salvar */
+#excluir {
+  background-color: #5a0000;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+#excluir:hover {
+  background-color: #b02a37;
+}

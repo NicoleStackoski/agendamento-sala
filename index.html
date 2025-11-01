@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Agendamento de Sala - Filial POA</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <h2>Agendamento de sala de especificação - Filial POA</h2>
+
+  <div class="mes-selector">
+    <select id="mes-select"></select>
+    <select id="ano-select"></select>
+  </div>
+
+  <table id="calendario">
+    <thead>
+      <tr>
+        <th>DOMINGO</th>
+        <th>SEGUNDA</th>
+        <th>TERÇA</th>
+        <th>QUARTA</th>
+        <th>QUINTA</th>
+        <th>SEXTA</th>
+        <th>SÁBADO</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- Modal de agendamento -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <label>Nome</label>
+      <select id="nome">
+        <option value="">Selecione...</option>
+        <option>Iara</option>
+        <option>Julia</option>
+        <option>Debora</option>
+        <option>Andreza</option>
+        <option>Mara</option>
+        <option>Lilian</option>
+        <option>Magui</option>
+        <option>Silvia</option>
+        <option>Magda</option>
+        <option>Grazi</option>
+        <option>Jaque</option>
+        <option>Tiago</option>
+        <option>Leonardo</option>
+        <option>Oliveira</option>
+        <option>Juliano</option>
+        <option>Marco</option>
+        <option>Gustavo</option>
+        <option>Cezar</option>
+        <option>Mauricio</option>
+        <option>Danilo</option>
+        <option>Rubens</option>
+        <option>Enio</option>
+        <option>Elton</option>
+        <option>Fábio</option>
+        <option>Landro</option>
+        <option>Mario</option>
+        <option>Fabricio</option>
+      </select>
+
+      <label>Horário inicial</label>
+      <select id="horaInicial"></select>
+
+      <label>Horário final</label>
+      <select id="horaFinal"></select>
+
+      <label>Cliente</label>
+      <input id="cliente" type="text" placeholder="Nome do cliente">
+
+      <div class="botoes">
+        <button id="salvar">Salvar</button>
+        <button id="cancelar">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de detalhes -->
+  <div id="detalhes" class="modal">
+    <div class="modal-content detalhes-box">
+      <h3>Detalhes do agendamento</h3>
+      <p id="detalhes-info"></p>
+      <button id="excluir">Excluir agendamento</button>
+      <button id="fechar-detalhes">Fechar</button>
+    </div>
+  </div>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>
