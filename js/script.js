@@ -1,3 +1,5 @@
+const API_URL = "https://69076c63b1879c890ed9bde4.mockapi.io/agendamento";
+
 const calendario = document.querySelector("#calendario tbody");
 const mesSelect = document.querySelector("#mes-select");
 const anoSelect = document.querySelector("#ano-select");
@@ -41,10 +43,30 @@ function popularMesesEAnos() {
   }
 }
 
-// === Gera calendário robusto (sem bug e sem UTC) ===
-function gerarCalendario(mes, ano) {
+// === Busca todos os agendamentos ===
+async function carregarAgendamentos() {
+  const res = await fetch(API_URL);
+  return await res.json();
+}
+
+// === Salva novo agendamento ===
+async function salvarNaAPI(dados) {
+  await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dados)
+  });
+}
+
+// === Exclui agendamento ===
+async function excluirDaAPI(id) {
+  await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+}
+
+// === Gera calendário ===
+async function gerarCalendario(mes, ano) {
   calendario.innerHTML = "";
-  const agendamentos = JSON.parse(localStorage.getItem("agendamentos") || "{}");
+  const agendamentos = await carregarAgendamentos();
 
   const primeiroDia = new Date(ano, mes, 1);
   const ultimoDia = new Date(ano, mes + 1, 0);
@@ -54,12 +76,10 @@ function gerarCalendario(mes, ano) {
   let dia = 1;
   let tr = document.createElement("tr");
 
-  // Espaços antes do 1º dia
   for (let i = 0; i < diaSemanaInicio; i++) {
     tr.appendChild(document.createElement("td"));
   }
 
-  // Preenche os dias do mês
   for (let i = diaSemanaInicio; i < 7; i++) {
     const td = criarCelula(dia, mes, ano, agendamentos);
     tr.appendChild(td);
@@ -77,7 +97,6 @@ function gerarCalendario(mes, ano) {
     calendario.appendChild(tr);
   }
 
-  // completa até 6 linhas (visualmente bonito)
   while (calendario.rows.length < 6) {
     const tr = document.createElement("tr");
     for (let i = 0; i < 7; i++) tr.appendChild(document.createElement("td"));
@@ -85,18 +104,18 @@ function gerarCalendario(mes, ano) {
   }
 }
 
+// === Cria célula ===
 function criarCelula(dia, mes, ano, agendamentos) {
   const td = document.createElement("td");
   td.textContent = dia.toString().padStart(2, "0");
 
-  const chave = `${dia}-${mes}-${ano}`;
-  const agDia = agendamentos[chave] || [];
+  const agDia = agendamentos.filter(a => parseInt(a.dia) === dia && parseInt(a.mes) === mes && parseInt(a.ano) === ano);
 
   agDia.forEach((ag) => {
     const span = document.createElement("span");
     span.classList.add("agendamento");
-    span.textContent = `${ag.nome} ${ag.inicio} às ${ag.fim}`;
-    span.onclick = () => mostrarDetalhes(chave, ag);
+    span.textContent = `${ag.nome} ${ag.horarioInicio} às ${ag.horarioFim}`;
+    span.onclick = () => mostrarDetalhes(ag);
     td.appendChild(span);
   });
 
@@ -118,22 +137,21 @@ function fecharModal() {
 }
 
 // === Modal detalhes ===
-function mostrarDetalhes(chave, ag) {
-  agendamentoAtual = { chave, ag };
+function mostrarDetalhes(ag) {
+  agendamentoAtual = ag;
   detalhesInfo.innerHTML = `
     <strong>Nome:</strong> ${ag.nome}<br>
-    <strong>Horário:</strong> ${ag.inicio} às ${ag.fim}<br>
+    <strong>Horário:</strong> ${ag.horarioInicio} às ${ag.horarioFim}<br>
     <strong>Cliente:</strong> ${ag.cliente}
   `;
   detalhesModal.style.display = "block";
 }
 fecharDetalhes.onclick = () => (detalhesModal.style.display = "none");
 
-// === Horários de meia em meia hora ===
+// === Horários ===
 function popularHorarios() {
   const ini = document.getElementById("horaInicial");
   const fim = document.getElementById("horaFinal");
-
   for (let h = 8; h <= 18; h++) {
     ["00", "30"].forEach((min) => {
       const hora = `${h.toString().padStart(2, "0")}:${min}`;
@@ -153,14 +171,14 @@ function temConflito(agDia, inicio, fim) {
   const fi = toMin(fim);
 
   return agDia.some((a) => {
-    const ai = toMin(a.inicio);
-    const af = toMin(a.fim);
+    const ai = toMin(a.horarioInicio);
+    const af = toMin(a.horarioFim);
     return !(fi <= ai || ini >= af);
   });
 }
 
 // === Salvar agendamento ===
-function salvarAgendamento() {
+async function salvarAgendamento() {
   const nome = document.getElementById("nome").value;
   const inicio = document.getElementById("horaInicial").value;
   const fim = document.getElementById("horaFinal").value;
@@ -171,38 +189,37 @@ function salvarAgendamento() {
     return;
   }
 
-  const chave = `${diaSelecionado.dia}-${diaSelecionado.mes}-${diaSelecionado.ano}`;
-  const agendamentos = JSON.parse(localStorage.getItem("agendamentos") || "{}");
-  agendamentos[chave] = agendamentos[chave] || [];
+  const todos = await carregarAgendamentos();
+  const agDia = todos.filter(a =>
+    a.dia == diaSelecionado.dia &&
+    a.mes == diaSelecionado.mes &&
+    a.ano == diaSelecionado.ano
+  );
 
-  if (temConflito(agendamentos[chave], inicio, fim)) {
+  if (temConflito(agDia, inicio, fim)) {
     alert("Horário já ocupado!");
     return;
   }
 
-  agendamentos[chave].push({ nome, inicio, fim, cliente });
-  localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
+  const novo = {
+    nome,
+    cliente,
+    horarioInicio: inicio,
+    horarioFim: fim,
+    dia: diaSelecionado.dia,
+    mes: diaSelecionado.mes,
+    ano: diaSelecionado.ano
+  };
 
+  await salvarNaAPI(novo);
   fecharModal();
   gerarCalendario(diaSelecionado.mes, diaSelecionado.ano);
 }
 
 // === Excluir ===
-excluirBtn.onclick = () => {
+excluirBtn.onclick = async () => {
   if (!agendamentoAtual) return;
-
-  const agendamentos = JSON.parse(localStorage.getItem("agendamentos") || "{}");
-  const lista = agendamentos[agendamentoAtual.chave] || [];
-  agendamentos[agendamentoAtual.chave] = lista.filter(
-    (a) =>
-      !(
-        a.nome === agendamentoAtual.ag.nome &&
-        a.inicio === agendamentoAtual.ag.inicio &&
-        a.fim === agendamentoAtual.ag.fim
-      )
-  );
-  localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-
+  await excluirDaAPI(agendamentoAtual.id);
   detalhesModal.style.display = "none";
   gerarCalendario(parseInt(mesSelect.value), parseInt(anoSelect.value));
 };
@@ -225,3 +242,4 @@ window.onload = () => {
   const anoAtual = new Date().getFullYear();
   gerarCalendario(mesAtual, anoAtual);
 };
+
